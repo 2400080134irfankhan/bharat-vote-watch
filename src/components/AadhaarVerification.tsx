@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { 
   checkEligibility, 
   recordVote, 
@@ -20,13 +22,26 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-type VerificationStep = "input" | "verifying" | "result" | "voting" | "success";
+type VerificationStep = "input" | "verifying" | "result" | "selecting" | "voting" | "success";
 
 interface VerificationResult {
   isEligible: boolean;
   hasVoted: boolean;
   message: string;
 }
+
+const PARTIES = [
+  { id: "party1", name: "Bharatiya Janata Party", symbol: "🪷", abbreviation: "BJP" },
+  { id: "party2", name: "Indian National Congress", symbol: "✋", abbreviation: "INC" },
+  { id: "party3", name: "Aam Aadmi Party", symbol: "🧹", abbreviation: "AAP" },
+  { id: "party4", name: "Bahujan Samaj Party", symbol: "🐘", abbreviation: "BSP" },
+  { id: "party5", name: "Communist Party of India", symbol: "🌾", abbreviation: "CPI" },
+  { id: "party6", name: "Nationalist Congress Party", symbol: "⏰", abbreviation: "NCP" },
+  { id: "party7", name: "Trinamool Congress", symbol: "🌸", abbreviation: "TMC" },
+  { id: "party8", name: "Shiv Sena", symbol: "🏹", abbreviation: "SS" },
+  { id: "party9", name: "Samajwadi Party", symbol: "🚲", abbreviation: "SP" },
+  { id: "party10", name: "Independent Candidate", symbol: "⭐", abbreviation: "IND" },
+];
 
 export function AadhaarVerification() {
   const navigate = useNavigate();
@@ -35,6 +50,7 @@ export function AadhaarVerification() {
   const [step, setStep] = useState<VerificationStep>("input");
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [consent, setConsent] = useState(false);
+  const [selectedParty, setSelectedParty] = useState<string>("");
 
   const handleAadhaarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 12);
@@ -70,7 +86,20 @@ export function AadhaarVerification() {
     setStep("result");
   };
 
-  const handleVote = async () => {
+  const handleProceedToVote = () => {
+    setStep("selecting");
+  };
+
+  const handleConfirmVote = async () => {
+    if (!selectedParty) {
+      toast({
+        title: "Selection Required",
+        description: "Please select a party to cast your vote.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setStep("voting");
     
     // Simulate voting process
@@ -80,9 +109,10 @@ export function AadhaarVerification() {
     
     if (voteRecorded) {
       setStep("success");
+      const party = PARTIES.find(p => p.id === selectedParty);
       toast({
         title: "Vote Recorded Successfully!",
-        description: "Thank you for participating in the democratic process.",
+        description: `Your vote for ${party?.name} has been recorded.`,
       });
     } else {
       toast({
@@ -90,7 +120,7 @@ export function AadhaarVerification() {
         description: "Unable to record your vote. Please try again.",
         variant: "destructive",
       });
-      setStep("result");
+      setStep("selecting");
     }
   };
 
@@ -99,6 +129,7 @@ export function AadhaarVerification() {
     setStep("input");
     setResult(null);
     setConsent(false);
+    setSelectedParty("");
   };
 
   const handleGoHome = () => {
@@ -239,7 +270,7 @@ export function AadhaarVerification() {
                 <div className="flex gap-3">
                   {result.isEligible && !result.hasVoted && (
                     <Button
-                      onClick={handleVote}
+                      onClick={handleProceedToVote}
                       className="flex-1 bg-india-green hover:bg-india-green-light h-12"
                     >
                       <Vote className="mr-2 h-5 w-5" />
@@ -253,6 +284,57 @@ export function AadhaarVerification() {
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Start Over
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === "selecting" && (
+              <div className="space-y-6 animate-fade-in-up">
+                <div className="text-center pb-4 border-b">
+                  <h3 className="text-lg font-semibold text-foreground">Select Your Party</h3>
+                  <p className="text-sm text-muted-foreground">Choose one party to cast your vote</p>
+                </div>
+
+                <RadioGroup value={selectedParty} onValueChange={setSelectedParty} className="space-y-3">
+                  {PARTIES.map((party) => (
+                    <div
+                      key={party.id}
+                      className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        selectedParty === party.id
+                          ? "border-ashoka-blue bg-ashoka-blue/5"
+                          : "border-muted hover:border-ashoka-blue/50 hover:bg-muted/50"
+                      }`}
+                      onClick={() => setSelectedParty(party.id)}
+                    >
+                      <RadioGroupItem value={party.id} id={party.id} />
+                      <Label htmlFor={party.id} className="flex-1 cursor-pointer flex items-center gap-3">
+                        <span className="text-2xl">{party.symbol}</span>
+                        <div>
+                          <p className="font-medium text-foreground">{party.name}</p>
+                          <p className="text-xs text-muted-foreground">{party.abbreviation}</p>
+                        </div>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleConfirmVote}
+                    disabled={!selectedParty}
+                    className="flex-1 bg-india-green hover:bg-india-green-light h-12"
+                  >
+                    <CheckCircle className="mr-2 h-5 w-5" />
+                    Confirm Vote
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep("result")}
+                    className="h-12"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
                   </Button>
                 </div>
               </div>
