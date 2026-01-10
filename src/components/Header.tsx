@@ -29,7 +29,17 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-soft">
       {/* Creator Watermark */}
-      <div className="absolute top-1 right-3 text-[10px] font-bold tracking-widest text-ashoka-blue/40 select-none pointer-events-none">
+      <div 
+        className="absolute top-2 right-4 text-xs font-black tracking-[0.3em] select-none pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, hsl(var(--saffron)) 0%, hsl(var(--ashoka-blue)) 50%, hsl(var(--india-green)) 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textShadow: '0 0 20px hsl(var(--ashoka-blue) / 0.3)',
+          filter: 'drop-shadow(0 0 8px hsl(var(--ashoka-blue) / 0.4))'
+        }}
+      >
         KHAN
       </div>
       
