@@ -105,11 +105,12 @@ export function AadhaarVerification() {
     // Simulate voting process
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const voteRecorded = recordVote(aadhaar);
+    const party = PARTIES.find(p => p.id === selectedParty);
+    const partyAbbrev = party?.abbreviation.toLowerCase() || selectedParty;
+    const voteRecorded = recordVote(aadhaar, partyAbbrev);
     
     if (voteRecorded) {
       setStep("success");
-      const party = PARTIES.find(p => p.id === selectedParty);
       toast({
         title: "Vote Recorded Successfully!",
         description: `Your vote for ${party?.name} has been recorded.`,

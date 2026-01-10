@@ -17,7 +17,8 @@ import {
   Activity,
   Lock
 } from "lucide-react";
-import { mockUsers, electionData } from "@/lib/mockData";
+import { mockUsers, electionData, votedAadhaar, voteRecords } from "@/lib/mockData";
+import { Database, PieChart } from "lucide-react";
 
 interface AuditLog {
   id: string;
@@ -131,13 +132,117 @@ export function AdminPanel() {
           </Card>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+        <Tabs defaultValue="votes" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="votes">Votes Database</TabsTrigger>
             <TabsTrigger value="users">Users & Roles</TabsTrigger>
             <TabsTrigger value="duplicates">Duplicate Attempts</TabsTrigger>
             <TabsTrigger value="audit">Audit Logs</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
+
+          {/* Votes Database Tab */}
+          <TabsContent value="votes">
+            <div className="grid gap-6">
+              {/* Vote Counts by Party */}
+              <Card className="shadow-soft">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-india-green" />
+                    Vote Counts by Party
+                  </CardTitle>
+                  <CardDescription>Real-time vote distribution across parties</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {(() => {
+                      const partyCounts: Record<string, number> = {};
+                      voteRecords.forEach(record => {
+                        partyCounts[record.party] = (partyCounts[record.party] || 0) + 1;
+                      });
+                      const parties = [
+                        { id: "bjp", name: "BJP", color: "bg-orange-500" },
+                        { id: "inc", name: "INC", color: "bg-blue-500" },
+                        { id: "aap", name: "AAP", color: "bg-cyan-500" },
+                        { id: "tmc", name: "TMC", color: "bg-green-600" },
+                        { id: "sp", name: "SP", color: "bg-red-500" },
+                        { id: "bsp", name: "BSP", color: "bg-blue-700" },
+                        { id: "ncp", name: "NCP", color: "bg-indigo-500" },
+                        { id: "cpim", name: "CPI(M)", color: "bg-red-700" },
+                        { id: "dmk", name: "DMK", color: "bg-yellow-600" },
+                        { id: "nota", name: "NOTA", color: "bg-gray-500" },
+                      ];
+                      return parties.map(party => (
+                        <div key={party.id} className="p-4 rounded-lg bg-muted/50 text-center">
+                          <div className={`w-8 h-8 rounded-full ${party.color} mx-auto mb-2`}></div>
+                          <p className="font-semibold">{party.name}</p>
+                          <p className="text-2xl font-bold">{partyCounts[party.id] || 0}</p>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div className="mt-4 p-4 bg-india-green/10 rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground">Total Votes Cast</p>
+                    <p className="text-3xl font-bold text-india-green">{voteRecords.length}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Voted Aadhaar Records */}
+              <Card className="shadow-soft">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Database className="h-5 w-5 text-ashoka-blue" />
+                    Voted Aadhaar Records
+                  </CardTitle>
+                  <CardDescription>Complete list of Aadhaar numbers that have cast votes (hashed for display)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {voteRecords.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Vote className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No votes cast yet</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-3 px-4 font-semibold">#</th>
+                            <th className="text-left py-3 px-4 font-semibold">Aadhaar Number</th>
+                            <th className="text-left py-3 px-4 font-semibold">Hashed ID</th>
+                            <th className="text-left py-3 px-4 font-semibold">Party Voted</th>
+                            <th className="text-left py-3 px-4 font-semibold">Timestamp</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {voteRecords.map((record, index) => (
+                            <tr key={index} className="border-b last:border-0 hover:bg-muted/50">
+                              <td className="py-4 px-4 font-medium">{index + 1}</td>
+                              <td className="py-4 px-4 font-mono text-sm">
+                                {record.aadhaar.slice(0, 4)}****{record.aadhaar.slice(-4)}
+                              </td>
+                              <td className="py-4 px-4 font-mono text-sm text-muted-foreground">
+                                {record.hashedAadhaar.slice(0, 8)}...
+                              </td>
+                              <td className="py-4 px-4">
+                                <Badge className="bg-india-green/10 text-india-green uppercase">
+                                  {record.party}
+                                </Badge>
+                              </td>
+                              <td className="py-4 px-4 text-sm text-muted-foreground">
+                                {record.timestamp}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           {/* Users Tab */}
           <TabsContent value="users">
