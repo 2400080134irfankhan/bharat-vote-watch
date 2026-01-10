@@ -28,6 +28,11 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-soft">
+      {/* Creator Watermark */}
+      <div className="absolute top-1 right-3 text-[10px] font-bold tracking-widest text-ashoka-blue/40 select-none pointer-events-none">
+        KHAN
+      </div>
+      
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
