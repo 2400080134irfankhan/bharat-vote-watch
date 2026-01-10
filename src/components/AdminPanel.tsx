@@ -15,7 +15,8 @@ import {
   FileText,
   Settings,
   Activity,
-  Lock
+  Lock,
+  LogOut
 } from "lucide-react";
 import { mockUsers, electionData, votedAadhaar, voteRecords } from "@/lib/mockData";
 import { Database, PieChart } from "lucide-react";
@@ -43,7 +44,11 @@ const duplicateAttempts = [
   { aadhaarHash: "m3n4o5p6...q7r8", attempts: 1, lastAttempt: "2024-01-15 09:20:00", blocked: true },
 ];
 
-export function AdminPanel() {
+interface AdminPanelProps {
+  onLogout?: () => void;
+}
+
+export function AdminPanel({ onLogout }: AdminPanelProps) {
   const [electionPhase, setElectionPhase] = useState<'pre' | 'live' | 'post'>('live');
 
   const getLogTypeIcon = (type: AuditLog['type']) => {
@@ -68,14 +73,26 @@ export function AdminPanel() {
   return (
     <div className="min-h-screen pt-20 pb-10 px-4 bg-muted/30">
       <div className="container mx-auto max-w-7xl">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 rounded-xl bg-ashoka-blue text-white">
-            <Shield className="h-6 w-6" />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-ashoka-blue text-white">
+              <Shield className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-ashoka-blue">Admin Panel</h1>
+              <p className="text-muted-foreground">Election management and monitoring</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-ashoka-blue">Admin Panel</h1>
-            <p className="text-muted-foreground">Election management and monitoring</p>
-          </div>
+          {onLogout && (
+            <Button 
+              variant="outline" 
+              onClick={onLogout}
+              className="text-destructive border-destructive hover:bg-destructive hover:text-white"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          )}
         </div>
 
         {/* Quick Stats */}

@@ -14,6 +14,11 @@ const AdminPage = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminAuthenticated");
+    setIsAuthenticated(false);
+  };
+
   if (!isAuthenticated) {
     return <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />;
   }
@@ -21,7 +26,7 @@ const AdminPage = () => {
   return (
     <>
       <Header />
-      <AdminPanel />
+      <AdminPanel onLogout={handleLogout} />
     </>
   );
 };
