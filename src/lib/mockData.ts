@@ -20,6 +20,16 @@ export const eligibleVoters: string[] = [
 // Track which Aadhaar numbers have already voted (hashed in real scenario)
 export const votedAadhaar: Set<string> = new Set();
 
+// Vote records for admin panel display
+export interface VoteRecord {
+  aadhaar: string;
+  hashedAadhaar: string;
+  party: string;
+  timestamp: string;
+}
+
+export const voteRecords: VoteRecord[] = [];
+
 // Mock election data
 export const electionData = {
   totalEligibleVoters: 150000,
@@ -139,12 +149,26 @@ export function checkEligibility(aadhaar: string): {
   };
 }
 
-// Record vote
-export function recordVote(aadhaar: string): boolean {
+// Record vote with party selection
+export function recordVote(aadhaar: string, party?: string): boolean {
   const hashedAadhaar = hashAadhaar(aadhaar);
   if (votedAadhaar.has(hashedAadhaar)) {
     return false;
   }
   votedAadhaar.add(hashedAadhaar);
+  
+  // Add to vote records for admin panel
+  if (party) {
+    voteRecords.push({
+      aadhaar,
+      hashedAadhaar,
+      party,
+      timestamp: new Date().toLocaleString('en-IN', { 
+        dateStyle: 'short', 
+        timeStyle: 'medium' 
+      }),
+    });
+  }
+  
   return true;
 }
