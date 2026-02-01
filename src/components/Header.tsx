@@ -13,19 +13,21 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "./LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const navItems = [
-  { path: "/", label: "Home", icon: Home },
-  { path: "/verify", label: "Vote", icon: Vote },
-  { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
-  { path: "/education", label: "Education", icon: BookOpen },
-  { path: "/observer", label: "Observer", icon: Eye },
-  { path: "/admin", label: "Admin", icon: Shield },
+  { path: "/", labelKey: "nav.home", icon: Home },
+  { path: "/verify", labelKey: "nav.vote", icon: Vote },
+  { path: "/dashboard", labelKey: "nav.dashboard", icon: BarChart3 },
+  { path: "/education", labelKey: "nav.education", icon: BookOpen },
+  { path: "/observer", labelKey: "nav.observer", icon: Eye },
+  { path: "/admin", labelKey: "nav.admin", icon: Shield },
 ];
 
 export function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-soft">
@@ -79,7 +81,7 @@ export function Header() {
                     )}
                   >
                     <Icon className="h-4 w-4" />
-                    {item.label}
+                    {t(item.labelKey)}
                   </Button>
                 </Link>
               );
@@ -122,7 +124,7 @@ export function Header() {
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      {item.label}
+                      {t(item.labelKey)}
                     </Button>
                   </Link>
                 );

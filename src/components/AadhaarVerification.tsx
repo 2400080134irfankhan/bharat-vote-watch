@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 type VerificationStep = "input" | "verifying" | "result" | "selecting" | "voting" | "success";
 
@@ -46,6 +47,7 @@ const PARTIES = [
 export function AadhaarVerification() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [aadhaar, setAadhaar] = useState("");
   const [step, setStep] = useState<VerificationStep>("input");
   const [result, setResult] = useState<VerificationResult | null>(null);
@@ -60,8 +62,8 @@ export function AadhaarVerification() {
   const handleVerify = async () => {
     if (!consent) {
       toast({
-        title: "Consent Required",
-        description: "Please accept the consent checkbox to proceed.",
+        title: t("toast.consent_required_title"),
+        description: t("toast.consent_required_desc"),
         variant: "destructive",
       });
       return;
@@ -69,8 +71,8 @@ export function AadhaarVerification() {
 
     if (!isValidAadhaarFormat(aadhaar)) {
       toast({
-        title: "Invalid Format",
-        description: "Please enter a valid 12-digit Aadhaar number.",
+        title: t("toast.invalid_format_title"),
+        description: t("toast.invalid_format_desc"),
         variant: "destructive",
       });
       return;
@@ -93,8 +95,8 @@ export function AadhaarVerification() {
   const handleConfirmVote = async () => {
     if (!selectedParty) {
       toast({
-        title: "Selection Required",
-        description: "Please select a party to cast your vote.",
+        title: t("toast.selection_required_title"),
+        description: t("toast.selection_required_desc"),
         variant: "destructive",
       });
       return;
@@ -112,13 +114,13 @@ export function AadhaarVerification() {
     if (voteRecorded) {
       setStep("success");
       toast({
-        title: "Vote Recorded Successfully!",
-        description: `Your vote for ${party?.name} has been recorded.`,
+        title: t("toast.vote_recorded_title"),
+        description: t("toast.vote_recorded_desc", { party: party?.name || "" }),
       });
     } else {
       toast({
-        title: "Vote Failed",
-        description: "Unable to record your vote. Please try again.",
+        title: t("toast.vote_failed_title"),
+        description: t("toast.vote_failed_desc"),
         variant: "destructive",
       });
       setStep("selecting");
@@ -146,7 +148,7 @@ export function AadhaarVerification() {
           className="mb-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          {t("verify.back_home")}
         </Button>
 
         <Card className="shadow-medium border-2 animate-scale-in">
@@ -154,9 +156,9 @@ export function AadhaarVerification() {
             <div className="mx-auto w-16 h-16 rounded-full bg-ashoka-blue flex items-center justify-center mb-4">
               <Vote className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl text-ashoka-blue">Verify & Vote</CardTitle>
+            <CardTitle className="text-2xl text-ashoka-blue">{t("verify.title")}</CardTitle>
             <CardDescription>
-              Use your Aadhaar to verify eligibility and cast your vote
+              {t("verify.subtitle")}
             </CardDescription>
           </CardHeader>
 
@@ -165,7 +167,7 @@ export function AadhaarVerification() {
               <div className="space-y-6 animate-fade-in-up">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Enter Aadhaar Number
+                    {t("verify.aadhaar_label")}
                   </label>
                   <Input
                     type="text"
@@ -176,7 +178,7 @@ export function AadhaarVerification() {
                     maxLength={14}
                   />
                   <p className="text-xs text-muted-foreground text-center">
-                    Enter your 12-digit Aadhaar number
+                    {t("verify.aadhaar_hint")}
                   </p>
                 </div>
 
@@ -211,14 +213,14 @@ export function AadhaarVerification() {
                     className="flex-1 bg-ashoka-blue hover:bg-ashoka-blue-light h-12"
                   >
                     <CheckCircle className="mr-2 h-5 w-5" />
-                    Verify & Proceed
+                    {t("verify.verify_proceed")}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={handleCancel}
                     className="h-12"
                   >
-                    Cancel
+                    {t("verify.cancel")}
                   </Button>
                 </div>
               </div>
@@ -227,8 +229,8 @@ export function AadhaarVerification() {
             {step === "verifying" && (
               <div className="py-12 text-center animate-fade-in-up">
                 <Loader2 className="h-16 w-16 animate-spin text-ashoka-blue mx-auto mb-4" />
-                <p className="text-lg font-medium text-foreground">Verifying Aadhaar...</p>
-                <p className="text-sm text-muted-foreground">Please wait while we check your eligibility</p>
+                <p className="text-lg font-medium text-foreground">{t("verify.verifying_title")}</p>
+                <p className="text-sm text-muted-foreground">{t("verify.verifying_subtitle")}</p>
               </div>
             )}
 
@@ -258,10 +260,10 @@ export function AadhaarVerification() {
                       : "text-destructive"
                   }>
                     {result.isEligible && !result.hasVoted
-                      ? "Eligible to Vote"
+                      ? t("verify.eligible_to_vote")
                       : result.hasVoted
-                      ? "Already Voted"
-                      : "Not Eligible"}
+                      ? t("verify.already_voted")
+                      : t("verify.not_eligible")}
                   </AlertTitle>
                   <AlertDescription className="text-sm mt-1">
                     {result.message}
@@ -275,7 +277,7 @@ export function AadhaarVerification() {
                       className="flex-1 bg-india-green hover:bg-india-green-light h-12"
                     >
                       <Vote className="mr-2 h-5 w-5" />
-                      Cast My Vote
+                      {t("verify.cast_vote")}
                     </Button>
                   )}
                   <Button
@@ -284,7 +286,7 @@ export function AadhaarVerification() {
                     className="flex-1 h-12"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Start Over
+                    {t("verify.start_over")}
                   </Button>
                 </div>
               </div>
@@ -293,8 +295,8 @@ export function AadhaarVerification() {
             {step === "selecting" && (
               <div className="space-y-6 animate-fade-in-up">
                 <div className="text-center pb-4 border-b">
-                  <h3 className="text-lg font-semibold text-foreground">Select Your Party</h3>
-                  <p className="text-sm text-muted-foreground">Choose one party to cast your vote</p>
+                  <h3 className="text-lg font-semibold text-foreground">{t("verify.select_party_title")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("verify.select_party_subtitle")}</p>
                 </div>
 
                 <RadioGroup value={selectedParty} onValueChange={setSelectedParty} className="space-y-3">
@@ -327,7 +329,7 @@ export function AadhaarVerification() {
                     className="flex-1 bg-india-green hover:bg-india-green-light h-12"
                   >
                     <CheckCircle className="mr-2 h-5 w-5" />
-                    Confirm Vote
+                    {t("verify.confirm_vote")}
                   </Button>
                   <Button
                     variant="outline"
@@ -335,7 +337,7 @@ export function AadhaarVerification() {
                     className="h-12"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back
+                    {t("verify.back")}
                   </Button>
                 </div>
               </div>
@@ -344,8 +346,8 @@ export function AadhaarVerification() {
             {step === "voting" && (
               <div className="py-12 text-center animate-fade-in-up">
                 <Loader2 className="h-16 w-16 animate-spin text-india-green mx-auto mb-4" />
-                <p className="text-lg font-medium text-foreground">Recording Your Vote...</p>
-                <p className="text-sm text-muted-foreground">Please do not close this window</p>
+                <p className="text-lg font-medium text-foreground">{t("verify.recording_title")}</p>
+                <p className="text-sm text-muted-foreground">{t("verify.recording_subtitle")}</p>
               </div>
             )}
 
@@ -354,17 +356,16 @@ export function AadhaarVerification() {
                 <div className="w-20 h-20 rounded-full bg-india-green/10 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="h-12 w-12 text-india-green" />
                 </div>
-                <h3 className="text-2xl font-bold text-india-green mb-2">Vote Recorded!</h3>
+                <h3 className="text-2xl font-bold text-india-green mb-2">{t("verify.success_title")}</h3>
                 <p className="text-muted-foreground mb-6">
-                  Thank you for participating in the democratic process. Your vote has been 
-                  securely recorded using a hashed identifier.
+                  {t("verify.success_subtitle")}
                 </p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={handleGoHome} className="bg-ashoka-blue hover:bg-ashoka-blue-light">
-                    Return Home
+                    {t("verify.return_home")}
                   </Button>
                   <Button variant="outline" onClick={() => navigate('/dashboard')}>
-                    View Dashboard
+                    {t("verify.view_dashboard")}
                   </Button>
                 </div>
               </div>
@@ -375,7 +376,7 @@ export function AadhaarVerification() {
         {/* Demo Aadhaar Numbers */}
         <Card className="mt-6 bg-muted/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Demo Aadhaar Numbers (for testing)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t("verify.demo_title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -392,7 +393,7 @@ export function AadhaarVerification() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Click to auto-fill. These are mock eligible Aadhaar numbers for demonstration.
+              {t("verify.demo_hint")}
             </p>
           </CardContent>
         </Card>
