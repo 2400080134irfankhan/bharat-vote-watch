@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Globe } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const indianLanguages = [
   { code: "en", name: "English", native: "English" },
@@ -33,11 +34,24 @@ const indianLanguages = [
 ];
 
 export function LanguageSelector() {
+  const { i18n, t } = useTranslation();
+
+  const selected = (i18n.resolvedLanguage || i18n.language || "en").split("-")[0];
+
+  const onChange = async (next: string) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("lang", next);
+    }
+    await i18n.changeLanguage(next);
+  };
+
   return (
-    <Select defaultValue="en">
+    <Select value={selected} onValueChange={onChange}>
       <SelectTrigger className="w-[140px] h-8 text-xs bg-background border-muted">
-        <Globe className="h-3 w-3 mr-1 text-ashoka-blue" />
-        <SelectValue placeholder="Language" />
+        <span className="flex items-center gap-1">
+          <Globe className="h-3 w-3 text-ashoka-blue" />
+          <SelectValue placeholder={t("language.label")} />
+        </span>
       </SelectTrigger>
       <SelectContent className="max-h-[300px]">
         {indianLanguages.map((lang) => (
