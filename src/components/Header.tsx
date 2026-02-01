@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from "./LanguageSelector";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -83,6 +84,9 @@ export function Header() {
                 </Link>
               );
             })}
+            <div className="ml-2 border-l border-border pl-2">
+              <LanguageSelector />
+            </div>
           </nav>
 
           {/* Mobile Menu Toggle */}
@@ -123,6 +127,9 @@ export function Header() {
                   </Link>
                 );
               })}
+              <div className="pt-2 border-t border-border mt-2">
+                <LanguageSelector />
+              </div>
             </div>
           </nav>
         )}
